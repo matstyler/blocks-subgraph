@@ -28,10 +28,7 @@ fn map_block(block: eth::v2::Block) -> Result<Block, substreams::errors::Error> 
 
 #[substreams::handlers::map]
 pub fn graph_out(block: Block) -> Result<EntityChanges, substreams::errors::Error> {
-    // // hash map of name to a table
     let mut tables = Tables::new();
-
-    // for block in blocks.into_iter() {
     tables
         .create_row("Block", block.number.to_string())
         .set("number", block.number)
@@ -40,7 +37,6 @@ pub fn graph_out(block: Block) -> Result<EntityChanges, substreams::errors::Erro
         .set("transactions", block.transactions)
         .set("hash", block.hash)
         .set("gas_used", block.gas_used);
-    // }
 
     Ok(tables.to_entity_changes())
 }
