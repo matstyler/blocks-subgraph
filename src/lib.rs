@@ -1,40 +1,46 @@
 mod pb;
+mod utils;
 
-use pb::example::{Contract, Contracts};
+use pb::blocks::{Block};
 
-use substreams::Hex;
 use substreams_entity_change::pb::entity::EntityChanges;
 use substreams_entity_change::tables::Tables;
 use substreams_ethereum::pb::eth;
+use crate::utils::{format_hex};
 
 #[substreams::handlers::map]
-fn map_contract(block: eth::v2::Block) -> Result<Contracts, substreams::errors::Error> {
-    let contracts = block
-        .calls()
-        .filter(|view| !view.call.state_reverted)
-        .filter(|view| view.call.call_type == eth::v2::CallType::Create as i32)
-        .map(|view| Contract {
-            address: format!("0x{}", Hex(&view.call.address)),
-            block_number: block.number,
-            timestamp: block.timestamp_seconds().to_string(),
-            ordinal: view.call.begin_ordinal,
-        })
-        .collect();
+fn map_block(block: eth::v2::Block) -> Result<Block, substreams::errors::Error> {
+    let header = block.header.as_ref().unwrap();
 
-    Ok(Contracts { contracts })
+    Ok(Block {
+        number: block.number,
+        timestamp: header
+            .timestamp
+            .as_ref()
+            .unwrap()
+            .seconds as u64,
+        size: block.size,
+        transactions: block.transactions().count() as u64,
+        hash: format_hex(&block.hash),
+        gas_used: header.gas_used,
+    })
 }
 
 #[substreams::handlers::map]
-pub fn graph_out(contracts: Contracts) -> Result<EntityChanges, substreams::errors::Error> {
-    // hash map of name to a table
+pub fn graph_out(block: Block) -> Result<EntityChanges, substreams::errors::Error> {
+    // // hash map of name to a table
     let mut tables = Tables::new();
 
-    for contract in contracts.contracts.into_iter() {
-        tables
-            .create_row("Contract", contract.address)
-            .set("timestamp", contract.timestamp)
-            .set("blockNumber", contract.block_number);
-    }
+    // for block in blocks.into_iter() {
+    tables
+        .create_row("Block", block.number.to_string())
+        .set("number", block.number)
+        .set("timestamp", block.timestamp)
+        .set("size", block.size)
+        .set("transactions", block.transactions)
+        .set("hash", block.hash)
+        .set("gas_used", block.gas_used);
+    // }
 
     Ok(tables.to_entity_changes())
 }

@@ -1,14 +1,14 @@
 specVersion: v0.1.0
 package:
-  name: 'substreams_test' # the name to be used in the .spkg
-  version: v1.0.1 # the version to use when creating the .spkg
+  name: 'blocks_substream'
+  version: v1.0.0
 
 imports: # dependencies
   entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v0.2.1/substreams-entity-change-v0.2.1.spkg
 
 protobuf: # specifies custom types for use by Substreams modules
   files:
-    - example.proto
+    - blocks.proto
   importPaths:
     - ./proto
 
@@ -17,17 +17,17 @@ binaries:
     type: wasm/rust-v1
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
-modules: # specify modules with their inputs and outputs.
-  - name: map_contract
+modules:
+  - name: map_block
     kind: map
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
-      type: proto:test.Contracts
+      type: proto:test.Blocks
 
   - name: graph_out
     kind: map
     inputs:
-      - map: map_contract
+      - map: map_block
     output:
       type: proto:substreams.entity.v1.EntityChanges # this type can be consumed by Graph Node

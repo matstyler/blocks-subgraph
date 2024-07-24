@@ -74,6 +74,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "blocks-substream"
+version = "1.0.0"
+dependencies = [
+ "base64",
+ "num-bigint",
+ "prost",
+ "prost-types",
+ "substreams",
+ "substreams-entity-change",
+ "substreams-ethereum",
+]
+
+[[package]]
 name = "byte-slice-cast"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -800,18 +813,6 @@ dependencies = [
  "quote",
  "substreams-ethereum-abigen",
  "syn",
-]
-
-[[package]]
-name = "substreams-ethereum-quickstart"
-version = "1.0.0"
-dependencies = [
- "base64",
- "prost",
- "prost-types",
- "substreams",
- "substreams-entity-change",
- "substreams-ethereum",
 ]
 
 [[package]]

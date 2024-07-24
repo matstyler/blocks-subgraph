@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package block;
+
+message Block {
+  uint64 timestamp = 1;
+  uint64 number = 2;
+  uint64 size = 3;
+  uint64 transactions = 4;
+  string hash = 5;
+  uint64 gas_used = 6;
+}
